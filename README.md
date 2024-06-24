@@ -7,9 +7,9 @@ The text of this license can be found in the LICENSES directory.
 # Open Console
 
 The software for Open Console is spread of multiple repositories:
-  * [[https://github.com/Skrodon/open-console-core|Core]]
-  * [[https://github.com/Skrodon/open-console-owner|Owner Website]]
-  * [[https://github.com/Skrodon/open-console-id|Identity provider]] (this repo)
+  * <https://github.com/Skrodon/open-console-core> Core
+  * <https://github.com/Skrodon/open-console-owner> Owner Website
+  * <https://github.com/Skrodon/open-console-connect> Connection provider (this repo)
 
 # Open Console, Identity Provider
  
