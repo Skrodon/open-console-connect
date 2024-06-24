@@ -11,6 +11,9 @@ The software for Open Console is spread of multiple repositories:
   * <https://github.com/Skrodon/open-console-owner> Owner Website
   * <https://github.com/Skrodon/open-console-connect> Connection provider (this repo)
 
+Have a look in the Wiki <https://github.com/Skrodon/open-console-connect/wiki/> for the
+specs!  There is no code here, yet, but it may soon arrive.
+
 # Open Console, Identity Provider
  
 This project is part of https://open-console.eu Open Console, which is
