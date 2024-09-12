@@ -7,9 +7,13 @@ The text of this license can be found in the LICENSES directory.
 # Open Console
 
 The software for Open Console is spread of multiple repositories:
-  * <https://github.com/Skrodon/open-console-core> Core
-  * <https://github.com/Skrodon/open-console-owner> Owner Website
+  * <https://github.com/Skrodon/open-console-core> Core implementation (required)
+  * <https://github.com/Skrodon/open-console-owner> Owner Website (required for now)
   * <https://github.com/Skrodon/open-console-connect> Connection provider (this repo)
+  * <https://github.com/Skrodon/open-console-tasks> Batch processing
+
+The design for the connector module is in the wiki of this repo:
+  * DESIGN: <https://github.com/Skrodon/open-console-connect/wiki>
 
 Have a look in the Wiki <https://github.com/Skrodon/open-console-connect/wiki/> for the
 specs!  There is no code here, yet, but it may soon arrive.
