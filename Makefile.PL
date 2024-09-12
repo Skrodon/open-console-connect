@@ -6,8 +6,8 @@ use ExtUtils::MakeMaker;
 use 5.016;
 
 WriteMakefile
- ( NAME     => 'Open-Console-Id'
- , VERSION  => '0.01'
+ ( NAME     => 'Open-Console-Connect'
+ , VERSION  => '0.02'
 
  , PREREQ_PM    => { 
 	# Common purpose modules
@@ -18,7 +18,7 @@ WriteMakefile
    }
  , EXE_FILES    => []
  , AUTHOR       => 'Open Console <team@open-console.eu>'
- , ABSTRACT     => 'Open Console Identities'
+ , ABSTRACT     => 'Open Console Connections'
  , LICENSE      => 'perl_5'
 
  , META_MERGE =>
@@ -26,8 +26,8 @@ WriteMakefile
       , resources  =>
           { repository =>
               { type => 'git'
-              , url  => 'https://github.com/Skrodon/open-console-id.git'
-              , web  => 'https://github.com/Skrodon/open-console-id'
+              , url  => 'https://github.com/Skrodon/open-console-connect.git'
+              , web  => 'https://github.com/Skrodon/open-console-connect'
               }
           , homepage => 'http://open-console.eu'
           , license  => [ 'http://dev.perl.org/licenses/' ]
@@ -39,8 +39,8 @@ WriteMakefile
 sub MY::postamble { <<'__POSTAMBLE' }
 
 # for DIST
-RAWDIR          = /tmp/OpenConsoleId/raw
-DISTDIR         = /tmp/OpenConsoleId/source
+RAWDIR          =
+DISTDIR         = /home/markov/shared/perl/public_html/open-console-connect/source
 
 # for POD
 FIRST_YEAR      = 2024
