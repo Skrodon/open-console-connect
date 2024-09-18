@@ -7,7 +7,7 @@ use 5.016;
 
 WriteMakefile
  ( NAME     => 'Open-Console-Connect'
- , VERSION  => '0.02'
+ , VERSION  => '0.03'
 
  , PREREQ_PM    => { 
 	# Common purpose modules
