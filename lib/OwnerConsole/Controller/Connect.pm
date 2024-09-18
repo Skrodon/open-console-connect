@@ -49,7 +49,7 @@ sub appLogin(%)
 
 	my $request = $self->req;
 	my $auth    = $request->headers->authorization || '';
-	my ($token) = $auth =~ m/^Bearer (.{,100})$/
+	my ($token) = $auth =~ m/^Bearer (.{0,100})$/
 		or return $self->render(json => {
 			ErrorCode => HTTP_NOT_ACCEPTABLE,
 			Message   => 'No or wrong authentication.',
@@ -111,7 +111,7 @@ sub _isLoggedIn($)
 {	my ($self, $request) = @_;
 
 	my $auth = $request->headers->authorization || '';
-	my ($token) = $auth =~ m/^Bearer (.{,100})$/;
+	my ($token) = $auth =~ m/^Bearer (.{0,100})$/;
 	unless($token)
 	{	$self->render(json => {
 			ErrorCode => HTTP_UNAUTHORIZED,
