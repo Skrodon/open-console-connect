@@ -1,0 +1,51 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Mojo::UserAgent ();
+use Data::Dumper;
+
+#use constant CONNECT    => 'https://connect-test.open-console.eu';
+use constant CONNECT    => 'http://localhost:3000/connect';
+
+my $service  = 'oc001:S:vGXVGkOxDaJApHmECSZAO2';
+my $secret   = 'abc';
+my $hostname = qx(hostname);
+
+my $ua = Mojo::UserAgent->new;
+
+sub login_instance($)
+{	my ($host) = @_;
+	my $session = $ua->post(CONNECT . '/application/login',
+		+{ Authorization => "Bearer $service" },
+		json => { secret => $secret, server => $host },
+	);
+
+	$session->result->json;
+}
+
+sub logout_instance($)
+{	my ($session) = @_;
+	my $token  = $session->{session}{bearer};
+	my $logout = $ua->get(CONNECT . '/application/logout',
+		+{ Authorization => "Bearer $token" },
+	);
+
+	$logout->result->json;
+}
+
+###
+### MAIN
+###
+
+my $session = login_instance $hostname;
+warn Dumper $session;
+
+#!!! Save the login results, because you will need it until it expires.
+
+my $confirm = logout_instance $session;
+warn Dumper $confirm;
+  
+
+

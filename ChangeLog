@@ -2,5 +2,8 @@
 
 version 0.02:
 
+	Improvements:
+	- implementation of login and logout
+
 version 0.01: Thu 09 Sep 14:32:26 CEST 2024
 	- Initial
