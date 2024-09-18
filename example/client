@@ -9,9 +9,10 @@ use Data::Dumper;
 #use constant CONNECT    => 'https://connect-test.open-console.eu';
 use constant CONNECT    => 'http://localhost:3000/connect';
 
-my $service  = 'oc001:S:vGXVGkOxDaJApHmECSZAO2';
-my $secret   = 'abc';
+my $service  = 'devel01:S:a7BL1JCC8O13cfChwtnaAe';
+my $secret   = 'wfj049cj2johvwlkhvlwhvl';
 my $hostname = qx(hostname);
+$hostname    =~ s/\n//;
 
 my $ua = Mojo::UserAgent->new;
 
