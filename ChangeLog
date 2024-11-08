@@ -6,6 +6,7 @@ version 0.03:
 	- below Perl 5.33, you need a 0 in /.{0,100}/
 
 	Improvements:
+	- start as separate daemon
 	- start to Comply
 	- start ConnectConsole
 

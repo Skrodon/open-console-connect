@@ -12,7 +12,8 @@ use OpenConsole::Util  qw(new_token timestamp);
 ConnectConsole::AppSession - temporary access for client applications
 
 =chapter DESCRIPTION
-When a client uses Connect to 
+When a client uses Connect to login an application instance, that instance gets a
+token which is registered by this object. 
 
 =chapter METHODS
 
@@ -35,22 +36,32 @@ sub create($%)
 =section Attributes
 =cut
 
-sub schema()      { '20240224' }
-
-sub serviceId()   { $_[0]->_data->{serviceid} }
-sub expires()     { $_[0]->_data->{expires} }
-
+sub schema()      { '20240912' }
 sub set()         { 'appsessions' }
 sub element()     { 'appsession'  }
 
-sub graceUntil($) { $_[0]->_data->{expires} = $_[1] }   #XXX couchdb: timestamp $_[1]
+sub serviceId()   { $_[0]->_data->{serviceid} }
+
+=method graceUntil $dt
+The application promises to stop using this AppSession token, but wants Open Console
+to still accept it until the indicated moment.  For instance, the token could still
+be visible on a webpage on some user's browser.
+=cut
+
+sub graceUntil($) { $_[0]->setData(expires => timestamp $_[1]) }
+
+=method service $serviceId
+Returns the related service object (if it still exists).
+=cut
+
+sub service()     { $_[0]->{CA_serv} ||= $::app->assets->service($_[0]->serviceId) }
 
 #------------------
 =section Actions
 =cut
 
-sub _load($)  { $::app->batch->appSession($_[1]) }
-sub _remove() { $::app->batch->removeAppSession($_[0]) }
-sub _save()   { $::app->batch->saveAppSession($_[0]) }
+sub _load($)  { $::app->connect->appSession($_[1]) }
+sub _remove() { $::app->connect->removeAppSession($_[0]) }
+sub _save()   { $::app->connect->saveAppSession($_[0]) }
 
 1;

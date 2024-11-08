@@ -4,5 +4,10 @@ Makefile.PL
 README.md
 connect-console.conf-example
 example/client
+script/connect-console
 lib/ConnectConsole/AppSession.pm
-lib/OwnerConsole/Controller/Connect.pm
+lib/ConnectConsole/Comply.pm
+lib/ConnectConsole/Controller/Application.pm
+lib/ConnectConsole/Controller.pm
+lib/ConnectConsole/Model/Connect.pm
+lib/ConnectConsole.pm

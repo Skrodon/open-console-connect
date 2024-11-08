@@ -1,12 +1,8 @@
 # SPDX-FileCopyrightText: 2024 Mark Overmeer <mark@open-console.eu>
 # SPDX-License-Identifier: EUPL-1.2-or-later
     
-package OwnerConsole::Controller::Connect;
-
-#XXX This base-class can do much more than needed for connect, so
-#XXX maybe useful to spilt this off, when the connector gets daemonized
-#XXX by itself.
-use Mojo::Base 'OwnerConsole::Controller';
+package ConnectConsole::Controller::Application;
+use Mojo::Base 'ConnectConsole::Controller';
     
 use Log::Report 'open-console-connect';
 
@@ -24,18 +20,20 @@ use HTTP::Status  qw/
 
 use OpenConsole::Util       qw(:tokens :time);
 
-use constant CONNECT_SITE   => 'https://connect-test.open-console.eu';
-
 =chapter NAME
-OwnerConsole::Controller::Connect - OpenID on steriods
+ConnectConsole::Controller::Application - Manage application logins
 
 =chapter DESCRIPTION
 
 =chapter METHODS
+
 =section Constructors
 =cut
 
 #--------------
+=section Attributes
+=cut
+
 =section Action
 
 =method appLogin
@@ -83,7 +81,9 @@ warn "SERVICE $service";
 	});
 	$session->save;
 
-	my %reply = (
+	my $site   = $self->config('vhost');
+
+	my %reply  = (
 		session => {
 			bearer  => $session->id,
 			created => $session->created,
@@ -93,21 +93,18 @@ warn "SERVICE $service";
 			name => $service->name,
 		},
 		connect => {
-			new_grant     => CONNECT_SITE . '',
-			refresh_grant => CONNECT_SITE . '',
-			userinfo      => CONNECT_SITE . '',
-			owner_website => $self->config('vhost'),
+			user_login    => "$site/user/login",
+ 			refresh_login => "$site/user/refresh",
+			user_info     => "$site/user/info",
+			owner_website => $self->config('ownersite'),
 		},
 	);
 
 	$self->render(json => \%reply, status => HTTP_OK);
 }
 
-=method _isLoggedIn
-Check whether the request has a valid appsession token.
-=cut
-
-sub _isLoggedIn($)
+# Check whether the request has a valid appsession token.
+sub _appIsLoggedIn($)
 {	my ($self, $request) = @_;
 
 	my $auth = $request->headers->authorization || '';
@@ -152,9 +149,14 @@ warn "SESSION ", Dumper $session;
 
 }
 
-=method appLogout
+=method appLogout %options
+REST implementation for application logout.
 
-Parameter: grace=xsd:Duration
+REST request parameters:
+=over 4
+=item C<grace> xsd:Duration (optional)
+=back
+
 =cut
 
 # https://github.com/Skrodon/open-console-connect/wiki/Application-Session#log-out-for-the-application
@@ -162,11 +164,10 @@ Parameter: grace=xsd:Duration
 sub appLogout(%)
 {	my ($self, %args) = @_;
 	my $request = $self->req;
-	my $session = $self->_isLoggedIn($request) or return;  # error already rendered
+	my $session = $self->_appIsLoggedIn($request) or return;  # error already rendered
 
 	my $config  = $self->config('connect');
-
-	my $grace   = $request->param('grace') || $config->{default_logout_grace};
+	my $grace   = $request->param('grace') || $self->config('logout')->{default_grace};
 	my $wait    = duration $grace;
 	unless(defined $wait)
 	{	$self->render(json => {
@@ -183,6 +184,69 @@ sub appLogout(%)
 	$self->render(json => {
 		grace_end => timestamp $end,
 	}, status => HTTP_OK);
+}
+
+=method userLogin %options
+REST implementation for logging-in a user.  Actions work towards a completely
+filled-in "Comply" object for this user on this service.
+
+REST request parameters:
+=over 4
+=item C<response_type> "code" (required constant string)
+=item C<client_id> $app_session_id (required)
+=item C<redirect_uri> uri (illegal)
+=item C<scope> string (optional)
+=item C<state> string (required)
+=back
+
+=cut
+
+sub userLogin(%)
+{	my ($self, %args) = @_;
+	my $request = $self->req;
+
+	my $ownersite = $self->config('ownersite') or panic;
+
+	### Understand the login button
+	#!! Login buttons are created by (unexperienced?) application builders, therefore
+	#!! we check the parameters carefully.
+
+	my $rt    = $request->param('response_type');
+	my $state = $request->param('state');
+	my $appid = $request->param('client_id');
+
+	#!!! keep these error in sync with core/templates/connect/errors.html.ep
+	my $error = ! $rt                       ? 'A01'
+	  : $rt ne 'code'                       ? 'A02'
+	  : $request->param('redirect_uri')     ? 'A03'
+	  : ! defined $state || ! length $state ? 'A04'
+	  : ! $appid                            ? 'A05'
+	  : ! is_valid_token $appid             ? 'A06'
+	  : token_class $appid ne 'appsession'  ? 'A07'
+	  : undef;
+
+	# The connect
+	if($error)
+	{	# The connect server does not produce webpages
+		return $self->redirect($ownersite . "/comply/error?error=$error");
+	}
+
+	### Check whether the application instance can still be used
+	my ($appsession, $comply);
+	if($appsession = $self->connect->appSession($appid))
+	{	# User may already be logged-in into Open Console
+		my $user_id = $self->session('user');
+		$comply = $self->connect->getComply(user => $user_id, service => $appsession->serviceId);
+	}
+
+	$error = ! $appsession      ? 'U01'
+	  : $appsession->hasExpired ? 'U02'
+	  : undef;
+
+	! $error
+		or return $self->redirect($ownersite . "/comply/error?error=$error");
+
+	my $scope = $request->param('scope');
 }
 
 1;

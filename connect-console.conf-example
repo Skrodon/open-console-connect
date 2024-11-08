@@ -8,8 +8,11 @@
 	# as prefix in userid's
 	instance => 'co001',
 
-	# Overrule the automatic detection of the virtual-host of the website
 	vhost    => 'https://connect.open-console.eu',
+
+	# Once the "Connect" has its own daemons, it sometimes need to redirect to
+	# the user website, for instance to Comply.
+	ownersite => 'https://open-console.eu',
 
 	#### Sessions
 
@@ -21,8 +24,14 @@
 	# You may decide you use https://metacpan.org/pod/Mojolicious::Command::secret
 	# to bake your cookie secrets.
 
-    #       XXXvvvv replace this one, with any hex string vvvXXX
+	#        XXXvvvv replace this one, with any hex string vvvXXX
 	secrets  => [ '9ed5714761d3c28ee83f2fb20d2991a3fe282b93' ],
+
+	#### REST
+
+	logout => {
+		default_grace => 'P1D',        # duration
+	},
 
 	#### Databases
 	#    various components are coded as if their data is location in different
@@ -30,23 +39,12 @@
 	#    When the databases use the same server URL, then they will share the
 	#    connections.
 
-	# Critical data, so need redundancy.  Optimized to have few writes.
-	# Where is the user's database? Contains users, identities, and groups.
-	userdb  => {
-		server => 'mongodb://localhost:27017',  # this is the default for mongodb
-		dbname => 'users',
-	},
-
-	# Medium critical data, mild in performance requirements.
-	proofdb  => {
-		server => 'mongodb://localhost:27017',
-		dbname => 'proofs',
-	},
-
 	# Low cricital data, but many writes: outgoing emails, presented tokens.
 	# Often the table data is processed by Minion tasks.
 	connectdb => {
 		server => 'mongodb://localhost:27017',
 		dbname => 'connect',
 	},
+
+
 }
